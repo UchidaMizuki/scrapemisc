@@ -1,13 +1,16 @@
 #' @export
 navitime_total_time <- function(X_orig, Y_orig, X_dest, Y_dest,
                                 start_time = lubridate::today() + lubridate::hours(9),
-                                url = "https://www.navitime.co.jp/maps") {
+                                url = "https://www.navitime.co.jp/maps",
+                                headless = TRUE) {
+  check_paths_allowed(url)
+
   start <- stringr::str_glue('{{"lat":{Y_orig},"lon":{X_orig}}}')
   goal <- stringr::str_glue('{{"lat":{Y_dest},"lon":{X_dest}}}')
   start_time <- format(start_time, format = "%Y-%d-%mT%H:%M:%S")
   url_route_result <- stringr::str_glue("{url}/routeResult?start={start}&goal={goal}&start-time={start_time}")
 
-  driver <- driver_selenium()
+  driver <- driver_selenium(headless = headless)
   on.exit(driver$close())
 
   pb <- progress::progress_bar$new(total = vec_size(url_route_result))
